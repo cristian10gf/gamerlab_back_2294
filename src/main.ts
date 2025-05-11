@@ -15,9 +15,9 @@ async function bootstrap() {
   }));
 
   app.enableCors({
-    origin: 'http://localhost:3001',
+    origin: '*',
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
-    credentials: true,
+    credentials: false,
   });
 
   const config = new DocumentBuilder()
