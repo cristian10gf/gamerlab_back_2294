@@ -3,7 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import express, { Request, Response } from 'express';
 import { Express } from 'express';
 import { INestApplication } from '@nestjs/common';
-import { AppModule } from './app.module.js';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 export class AppFactory {
   static create(): {
@@ -22,9 +24,30 @@ export class AppFactory {
          * Enable cross-origin resource sharing (CORS) to allow resources to be requested from another domain.
          * @see {@link https://docs.nestjs.com/security/cors}
          */
+
+        app.setGlobalPrefix('api/v1');
+
+        app.useGlobalPipes(new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true,
+        }));
+
         app.enableCors({
-          exposedHeaders: '*',
+            origin: '*',
+            methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
+            credentials: true,
+            allowedHeaders: '*',
+            exposedHeaders: '*',
         });
+
+        const config = new DocumentBuilder()
+            .setTitle('Feria Gamer API')
+            .setDescription('The Feria Gamer API description')
+            .setVersion('0.2')
+            .build();
+        const documentFactory = () => SwaggerModule.createDocument(app, config);
+        SwaggerModule.setup('docs', app, documentFactory);
 
         app.init();
       })
